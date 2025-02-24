@@ -1,10 +1,15 @@
 "use client";
 
+import { useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { FirebaseError } from "firebase/app";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { Loader2 } from "lucide-react";
 
-import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -24,6 +29,8 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 
+import { cn } from "@/lib/utils";
+import { getFirebaseAuthErrorMessage, signUp } from "@/services";
 import { authFormSchema, AuthFormFieldValues } from "@/utils/validations";
 import { authFormFields } from "@/utils/constants";
 
@@ -31,6 +38,8 @@ export function SignUpForm({
   className,
   ...props
 }: React.ComponentPropsWithoutRef<"div">) {
+  const router = useRouter();
+
   const form = useForm<z.infer<typeof authFormSchema>>({
     resolver: zodResolver(authFormSchema),
     defaultValues: {
@@ -39,8 +48,26 @@ export function SignUpForm({
     },
   });
 
-  const onSubmit = (data: AuthFormFieldValues) => {
-    console.log("#signout", data);
+  const [loading, setLoading] = useState<boolean>(false);
+
+  const onSubmit = async (data: AuthFormFieldValues) => {
+    setLoading(true);
+    try {
+      const { email, password } = data;
+      await signUp(email, password);
+      router.push("/dashboard");
+    } catch (error) {
+      const errorMessage =
+        error instanceof FirebaseError
+          ? getFirebaseAuthErrorMessage(error)
+          : (error as Error).message;
+
+      toast("Sign in failed", {
+        description: errorMessage,
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -68,7 +95,7 @@ export function SignUpForm({
                   </span>
                 </div>
               </div>
-              {authFormFields.map(({ id, label, placeholder }) => (
+              {authFormFields.map(({ id, label, placeholder, type }) => (
                 <FormField
                   key={id}
                   control={form.control}
@@ -77,16 +104,27 @@ export function SignUpForm({
                     <FormItem>
                       <FormLabel>{label}</FormLabel>
                       <FormControl>
-                        <Input placeholder={placeholder} {...field} />
+                        <Input
+                          placeholder={placeholder}
+                          type={type}
+                          {...field}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
               ))}
+              <div className="mt-4 text-center text-sm">
+                Do you already have an account?{" "}
+                <Link href="/signin" className="underline underline-offset-4">
+                  Sign In
+                </Link>
+              </div>
             </CardContent>
             <CardFooter>
-              <Button type="submit" className="w-full">
+              <Button type="submit" className="w-full" disabled={loading}>
+                {loading && <Loader2 className="animate-spin" />}
                 Create account
               </Button>
             </CardFooter>

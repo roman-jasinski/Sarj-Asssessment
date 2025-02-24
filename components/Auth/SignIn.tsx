@@ -1,11 +1,15 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
+import { FirebaseError } from "firebase/app";
+import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { Loader2 } from "lucide-react";
 
-import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -24,6 +28,8 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 
+import { cn } from "@/lib/utils";
+import { signIn, getFirebaseAuthErrorMessage } from "@/services";
 import { authFormSchema, AuthFormFieldValues } from "@/utils/validations";
 import { authFormFields } from "@/utils/constants";
 
@@ -31,6 +37,8 @@ export function SignInForm({
   className,
   ...props
 }: React.ComponentPropsWithoutRef<"div">) {
+  const router = useRouter();
+
   const form = useForm<z.infer<typeof authFormSchema>>({
     resolver: zodResolver(authFormSchema),
     defaultValues: {
@@ -39,8 +47,26 @@ export function SignInForm({
     },
   });
 
-  const onSubmit = (data: AuthFormFieldValues) => {
-    console.log("#signin", data);
+  const [loading, setLoading] = useState<boolean>(false);
+
+  const onSubmit = async (data: AuthFormFieldValues) => {
+    setLoading(true);
+    try {
+      const { email, password } = data;
+      await signIn(email, password);
+      router.push("/dashboard");
+    } catch (error) {
+      const errorMessage =
+        error instanceof FirebaseError
+          ? getFirebaseAuthErrorMessage(error)
+          : (error as Error).message;
+
+      toast("Sign in failed", {
+        description: errorMessage,
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -55,38 +81,41 @@ export function SignInForm({
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <form>
-                <div className="flex flex-col gap-6">
-                  {authFormFields.map(({ id, label, placeholder }) => (
-                    <FormField
-                      key={id}
-                      control={form.control}
-                      name={id as keyof AuthFormFieldValues}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>{label}</FormLabel>
-                          <FormControl>
-                            <Input placeholder={placeholder} {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  ))}
-                  <Button type="submit" className="w-full">
-                    Sign In
-                  </Button>
-                  <Button variant="outline" className="w-full">
-                    Sign In with Google
-                  </Button>
-                </div>
-                <div className="mt-4 text-center text-sm">
-                  Don&apos;t have an account?{" "}
-                  <Link href="/signup" className="underline underline-offset-4">
-                    Sign up
-                  </Link>
-                </div>
-              </form>
+              <div className="flex flex-col gap-6">
+                {authFormFields.map(({ id, label, placeholder, type }) => (
+                  <FormField
+                    key={id}
+                    control={form.control}
+                    name={id as keyof AuthFormFieldValues}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{label}</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder={placeholder}
+                            type={type}
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                ))}
+                <Button type="submit" className="w-full" disabled={loading}>
+                  {loading && <Loader2 className="animate-spin" />}
+                  Sign In
+                </Button>
+                <Button variant="outline" className="w-full">
+                  Sign In with Google
+                </Button>
+              </div>
+              <div className="mt-4 text-center text-sm">
+                Don&apos;t have an account?{" "}
+                <Link href="/signup" className="underline underline-offset-4">
+                  Sign up
+                </Link>
+              </div>
             </CardContent>
           </Card>
         </form>
