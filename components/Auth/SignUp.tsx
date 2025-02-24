@@ -62,7 +62,7 @@ export function SignUpForm({
           ? getFirebaseAuthErrorMessage(error)
           : (error as Error).message;
 
-      toast("Sign in failed", {
+      toast("Sign up failed", {
         description: errorMessage,
       });
     } finally {
