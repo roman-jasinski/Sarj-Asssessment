@@ -1,24 +1,30 @@
 "use client";
 
-import React, { useState, ChangeEvent } from 'react';
-import { fetchBookByID } from '@/services';
+import React, { useState } from "react";
 
-export const FetchBook = () => {
+import FetchBookForm from "@/components/Dashboard/FetchBookForm";
+import SaveBookData from "@/components/Dashboard/SaveBookData";
+import BookDetailSection from "./BookDetail";
+import { BookDetail } from "@/utils/types";
 
-  const [bookID, setBookID] = useState<string>("");
-
-  const handleBookID = (e: ChangeEvent<HTMLInputElement>) => {
-    setBookID(e.target.value);
-  };
-
-  const handleFetchButton = () => {
-    fetchBookByID(bookID);
-  }
+export default function FetchBook() {
+  const [bookData, setBookData] = useState<BookDetail | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
 
   return (
-    <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
-      <input placeholder="please input the book ID" value={bookID} onChange={handleBookID} />
-      <button onClick={handleFetchButton}>Fetch</button>
+    <div className="flex flex-col p-10 gap-10 max-w-4xl">
+      <FetchBookForm
+        loading={loading}
+        setLoading={setLoading}
+        setBookData={setBookData}
+      />
+      {loading && <div className="flex justify-center">Fetching...</div>}
+      {!loading && !!bookData && (
+        <div className="flex flex-col gap-10">
+          <BookDetailSection bookData={bookData} />
+          <SaveBookData />
+        </div>
+      )}
     </div>
   );
 }
