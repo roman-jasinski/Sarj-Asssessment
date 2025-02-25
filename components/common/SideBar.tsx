@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { CloudDownload, Home, LibraryBig } from "lucide-react";
 
 import {
@@ -15,17 +16,17 @@ import {
 const items = [
   {
     title: "Home",
-    url: "dashboard",
+    url: "/dashboard",
     icon: Home,
   },
   {
     title: "Fetch Book",
-    url: "fetch-book",
+    url: "/fetch-book",
     icon: CloudDownload,
   },
   {
     title: "My Books",
-    url: "my-books",
+    url: "/my-books",
     icon: LibraryBig,
   },
 ];
@@ -41,10 +42,10 @@ export function AppSidebar() {
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
-                    <a href={item.url}>
+                    <Link href={item.url}>
                       <item.icon />
                       <span>{item.title}</span>
-                    </a>
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}

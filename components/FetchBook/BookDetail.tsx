@@ -9,9 +9,9 @@ interface BookDetailProps {
 export default function BookDetailSection({ bookData }: BookDetailProps) {
   const { metadata, analysis } = bookData;
   return (
-    <React.Fragment>
+    <div className="flex flex-col gap-10">
       <BookDetailTable title="Metadata" data={metadata} />
       <BookDetailTable title="Analysis" data={analysis} />
-    </React.Fragment>
+    </div>
   );
 }

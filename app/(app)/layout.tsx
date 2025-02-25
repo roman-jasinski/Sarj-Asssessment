@@ -1,5 +1,6 @@
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/common/SideBar";
+import ProtectedRoute from "@/components/Auth/ProtectedRoute";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -7,7 +8,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       <AppSidebar />
       <main className="w-full">
         <SidebarTrigger />
-        {children}
+        <ProtectedRoute>{children}</ProtectedRoute>
       </main>
     </SidebarProvider>
   );

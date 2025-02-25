@@ -6,6 +6,7 @@ export interface BookDetailItem {
 }
 
 export interface BookDetail {
+  id: string;
   metadata: BookDetailItem[];
   analysis: BookDetailItem[];
 }

@@ -15,17 +15,19 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { fetchBookByID } from "@/services";
-import { bookFormSchema } from "@/utils/validations";
+import { bookFormSchema, BookFormFieldValues } from "@/utils/validations";
 import { BookDetail } from "@/utils/types";
 
 export interface FetchBookFormProps {
   loading: boolean;
+  setBookId: React.Dispatch<React.SetStateAction<string>>;
   setLoading: React.Dispatch<React.SetStateAction<boolean>>;
   setBookData: React.Dispatch<React.SetStateAction<BookDetail | null>>;
 }
 
 export default function FetchBookForm({
   loading,
+  setBookId,
   setLoading,
   setBookData,
 }: FetchBookFormProps) {
@@ -38,11 +40,14 @@ export default function FetchBookForm({
   });
 
   // Handle form submission
-  const onSubmit = async (data: { bookID: string }) => {
+  const onSubmit = async (data: BookFormFieldValues) => {
+    const { bookID } = data;
+
     setLoading(true);
     try {
-      const bookData = await fetchBookByID(data.bookID);
+      const bookData = await fetchBookByID(bookID);
       setBookData(bookData);
+      setBookId(bookID);
     } catch (error) {
       console.error("Error fetching book data:", error);
     } finally {

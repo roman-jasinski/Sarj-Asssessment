@@ -1,5 +1,7 @@
+"use client";
+
 import { useEffect, useState, ReactNode } from "react";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import { User } from "firebase/auth";
 
 import { auth } from "@/config/firebaseConfig";
