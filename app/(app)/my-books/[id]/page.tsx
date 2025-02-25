@@ -1,11 +1,11 @@
 import MyBookDetail from "@/components/MyBooks/MyBookDetail";
 
-export default function MyBookDetailPage({
+export default async function Page({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
-  const { id } = params;
+  const id = (await params).id;
 
   return (
     <div className="flex w-full items-center justify-center p-6 md:p-10">
