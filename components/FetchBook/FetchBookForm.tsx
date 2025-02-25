@@ -14,13 +14,15 @@ import {
 } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { fetchBookByID } from "@/services";
+import { auth } from "@/config/firebaseConfig";
+import { fetchBookByID, getUserBookList } from "@/services";
 import { bookFormSchema, BookFormFieldValues } from "@/utils/validations";
 import { BookDetail } from "@/utils/types";
 
 export interface FetchBookFormProps {
   loading: boolean;
   setBookId: React.Dispatch<React.SetStateAction<string>>;
+  setUserBookIds: React.Dispatch<React.SetStateAction<string[]>>;
   setLoading: React.Dispatch<React.SetStateAction<boolean>>;
   setBookData: React.Dispatch<React.SetStateAction<BookDetail | null>>;
 }
@@ -28,6 +30,7 @@ export interface FetchBookFormProps {
 export default function FetchBookForm({
   loading,
   setBookId,
+  setUserBookIds,
   setLoading,
   setBookData,
 }: FetchBookFormProps) {
@@ -45,9 +48,12 @@ export default function FetchBookForm({
 
     setLoading(true);
     try {
+      const user = auth.currentUser;
       const bookData = await fetchBookByID(bookID);
+      const bookIds = await getUserBookList(user?.uid ?? "");
       setBookData(bookData);
       setBookId(bookID);
+      setUserBookIds(bookIds);
     } catch (error) {
       console.error("Error fetching book data:", error);
     } finally {

@@ -11,8 +11,6 @@ export default function MyBooks() {
 
   if (loading) return <Loading />;
 
-  console.log("#bookDetails", bookDetails);
-
   return (
     <div className="flex flex-col gap-4">
       <div className="text-3xl font-bold">My Books</div>
