@@ -42,7 +42,6 @@ export default function FetchBookForm({
     setLoading(true);
     try {
       const bookData = await fetchBookByID(data.bookID);
-      console.log("#bookData", bookData);
       setBookData(bookData);
     } catch (error) {
       console.error("Error fetching book data:", error);
@@ -52,7 +51,7 @@ export default function FetchBookForm({
   };
 
   return (
-    <div>
+    <div className="flex justify-center">
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}

@@ -1,11 +1,7 @@
-import FetchBook from "@/components/Dashboard/FetchBook";
-
-export default function DashboardPage() {
+export default function SignInPage() {
   return (
-    <div className="flex w-full items-center justify-center p-6 md:p-10">
-      <div className="w-full max-w-3xl">
-        <FetchBook />
-      </div>
+    <div className="flex w-full justify-center mt-64">
+      <div className="text-4xl font-bold">Welcome to book store!</div>
     </div>
   );
 }
